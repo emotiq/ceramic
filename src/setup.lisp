@@ -60,10 +60,11 @@
 
 (defun copy-ws-module (directory &key operating-system)
   "Copy the WebSockets module."
-  (copy-directory:copy +ws-module+
-                       (merge-pathnames #p"node_modules/ws/"
+  (let ((path (merge-pathnames #p"node_modules/ws/"
                                         (app-directory directory
                                                        :operating-system operating-system))))
+  (ensure-directories-exist path)
+  (copy-directory:copy +ws-module+ path)))
 
 (defun prepare-release (directory &key operating-system)
   "Prepare an Electron release."
@@ -82,15 +83,14 @@
   "Set up everything needed to start developing."
   (log-message "Creating Ceramic directories...")
   (ensure-directories-exist (release-directory))
-  (if (or (uiop:emptyp (uiop:directory-files (release-directory)))
-          force)
+  (if  t ;; (or (uiop:emptyp (uiop:directory-files (release-directory)))
+         ;; force)
       (progn
-        (log-message "Downloading a copy of Electron...")
-        (ensure-directories-exist (release-directory))
-        (get-release (release-directory)
+        (get-release (uiop:pathname-parent-directory-pathname (release-directory)) ; put zip one level higher
                      :operating-system *operating-system*
                      :architecture *architecture*
-                     :version *electron-version*))
+                     :version *electron-version*
+                     :force force))
       (log-message "Already downloaded. Use :force t to force download."))
   (log-message "Preparing the files...")
   (prepare-release (release-directory) :operating-system *operating-system*)

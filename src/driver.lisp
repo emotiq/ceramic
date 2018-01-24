@@ -29,10 +29,12 @@
 
 (defclass driver ()
   ((process :accessor driver-process
-            :documentation "The Electron process.")
+            :documentation "The Electron process."
+            :initform nil)
    (context :accessor driver-context
-            :type remote-js:buffered-context
-            :documentation "The remote-js object.")
+            :type (or null remote-js:buffered-context)
+            :documentation "The remote-js object."
+            :initform nil)
    (js-lock :accessor driver-js-lock
             :initform (bt:make-lock "ceramic-js-sync")
             :documentation "A lock object for js sync")
@@ -171,11 +173,13 @@
 
 (defmethod wait-for-client ((driver driver))
   "Wait for the client to connect to the WebSockets server."
-  (loop until (remote-js:context-connected-p (driver-context driver))))
+  (loop until (or (null (driver-context driver))
+                  (remote-js:context-connected-p (driver-context driver)))
+    do (sleep .1)))
 
 (defmethod stop-remote-js ((driver driver))
   "Stop the remote-js server."
   (with-slots (context) driver
     (remote-js:stop context))
-  (slot-makunbound driver 'context)
+  (setf (driver-context driver) nil)
   (values))

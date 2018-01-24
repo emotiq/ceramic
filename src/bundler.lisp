@@ -48,9 +48,10 @@ most people can unzip)."
                                               work-directory))
          (executable-pathname (merge-pathnames (make-pathname :name application-name)
                                                work-directory))
+         #+IGNORE
          (asdf-registry-prelude
           (if system-directory
-              (format nil +asdf-registry-prelude+
+              (format nil +asdf-registry-prelude+ ;;; UNDEFINED
                       (uiop:pathname-directory-pathname
                        system-directory)
                       ""))))
