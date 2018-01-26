@@ -12,6 +12,8 @@ Ceramic takes an ordinary Common Lisp web app, and bundles it into an executable
 you can distribute, so your users can install it and run the app and server in a
 dedicated desktop window like any other app.
 
+NOTE: This version was forked and modified by Shannon Spires to have fewer dependencies. Some of the dependent libraries were modified as well; when in doubt, use the ones here rather than the ones on Borretti's area or on quicklisp.
+
 See the [documentation](http://ceramic.github.io/docs/introduction.html).
 
 ## License
