@@ -2,6 +2,9 @@
 ;;;  lucerne, clack, lack, cl-annot or any of that nonsense.
 ;;;  Just pure Hunchentoot.
 
+;;; NOTE: Ceramic/Electron caches its output at ~/Library/Application Support/Ceramic/Electron.
+;;;       You might need to blow away those files if you make changes here.
+
 (in-package :cl-user)
 
 #|
@@ -19,7 +22,7 @@ Then run
 [above step needed because -- again -- automatic extraction doesn't work and the
 prepare-release process has to happen after extraction.]
 
-(ceramic:start)
+
 [load this file]
 (run)
 
@@ -29,8 +32,10 @@ To stop, do
 
 IF YOU WANT TO CREATE A SELF-CONTAINED BUNDLE, THEN ALSO DO
 
-(ceramic:bundle :ceramic-hello-world)
+; following still uses cl-annot, because jonathan needs it and we need json capability.
+; cl-annot causes a reader macro conflict with #P
 
+(ceramic:bundle :ceramic-hello-world)
 |#
 
 (ql:quickload :ceramic)
@@ -56,22 +61,23 @@ IF YOU WANT TO CREATE A SELF-CONTAINED BUNDLE, THEN ALSO DO
                                       :persistent-connections-p t
                                       ))))
 
-; following isn't working. we're just getting the default Hunchentoot page.
 (hunchentoot:define-easy-handler (hello :uri "/")
     ()
   (with-html
     (:html
-     (:head (:title "Hunchentoot \"easy\" handler example"))
+     (:head (:title "Ceramic example"))
      (:body
       (:h2 
-       " \"Easy\" handler example")
+       "Hello Ceramic!")
       (:p )
       ))))
 
 (defun run ()
+  (ceramic:start)
+  (start-hunch :port *port*)
   (let ((window (ceramic:make-window :url (format nil "http://localhost:~D/" *port*))))
     (ceramic:show window)
-    (start-hunch :port *port*)))
+    ))
 
 (ceramic:define-entry-point :ceramic-hello-world ()
   (run))
